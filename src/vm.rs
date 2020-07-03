@@ -93,8 +93,35 @@ impl VM{
                     self.equal_flag = false;
                 }
                 self.next_8_bits();
+            },
+            Opcode::NEQ =>{
+                let register1 = self.registers[self.next_8_bits() as usize];
+                let register2 = self.registers[self.next_8_bits() as usize];
+                if register1 != register2{
+                    self.equal_flag = true;
+                }else{
+                    self.equal_flag = false;
+                }
+                self.next_8_bits();
+            },
+            Opcode::GT =>{
+                let register1 = self.registers[self.next_8_bits() as usize];
+                let register2 = self.registers[self.next_8_bits() as usize];
+                if register1 > register2{
+                    self.equal_flag = true;
+                }else{
+                    self.equal_flag = false;
+                }
+                self.next_8_bits();
+            },
 
-            }
+            Opcode::JE=>{
+                let register= self.next_8_bits() as usize;
+                let target = self.registers[register];
+                if self.equal_flag{
+                    self.pc = target as usize;
+                }
+            },
         }
         true
     }
@@ -187,5 +214,13 @@ mod tests{
         test_vm.registers[1] = 20;
         test_vm.run_once();
         assert_eq!(test_vm.equal_flag, false);
+    }
+    fn test_opcode_je(){
+        let mut test_vm = VM::new();
+        test_vm.registers[0] = 7;
+        test_vm.equal_flag = true;
+        test_vm.program = vec![16,0,0,0,17,0,0,0,17,0,0,0];
+        test_vm.run_once();
+        assert_eq!(test_vm.pc, 7);
     }
 }
